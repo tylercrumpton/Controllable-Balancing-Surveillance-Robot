@@ -16,8 +16,7 @@ double KI = 0.05;
 double KD = 0.25;
 
 int desiredTilt;  // Desired tilt of robot (+/- MAX_TILT)
-int desiredSpeed; // Desired speed of motors (+/- MAX_MOTOR_SPEED)
-int actualSpeed; // Base motor speed for balance (+/- MAX_MOTOR_SPEED)
+int balanceSpeed; // Base motor speed for balance (+/- MAX_MOTOR_SPEED)
 int turnSpeed;    // Turn speed differential of robot (+/- MAX_TURN_SPEED)
 
 
@@ -30,8 +29,7 @@ void setup()
   // Initialize variables.
   turnSpeed    = 0;
   desiredTilt  = 0;
-  desiredSpeed = 0;
-  actualSpeed = 0;
+  balanceSpeed = 0;
   
   // Setup pin IO:
   pinMode(LEFT_PWM_PIN, OUTPUT);
@@ -51,12 +49,12 @@ void loop()
   balance();
 }
 
-// Calculate actualSpeed given tilt angle.
+// Calculate balanceSpeed given tilt angle.
 int calcPID(int input, int target)
 {
   inputPID = input;   // Set PID input to tilt angle.
   bPID.Compute();     // Compute correction, store in outputPID.
-  actualSpeed = outputPID;
+  balanceSpeed = outputPID;
 }
 
 
@@ -66,10 +64,9 @@ void balance()
   int gyro  = readGyro();
   int accel = readAccel();
   int angle = getAngle(gyro, accel);
-  desiredTilt = getDesiredTilt();
   
   // Try to balance the robot at the desired angle.
-  actualSpeed = calcPID(angle, desiredTilt);
+  balanceSpeed = calcPID(angle, desiredTilt);
   
   // Update the motor PWM values.
   updateMotors();
@@ -90,17 +87,11 @@ int getAngle(int gyroSpeed, int acceleration)
   //TODO: Use some sort of filter to get actual angle.
 }
 
-// Gets desired tilt angle based on desired speed.
-int getDesiredTilt()
-{
-  return desiredSpeed * MAX_TILT / MAX_MOTOR_SPEED;
-}
-
 // Converts the value between +/- MAX_MOTOR_SPEED to an actual PWM signal and direction
 void updateMotors()
 {
-  int tempLeftSpeed = actualSpeed - turnSpeed;    // Left motor speed from -255 to 255
-  int tempRightSpeed = actualSpeed + turnSpeed;   // Reft motor speed from -255 to 255
+  int tempLeftSpeed = balanceSpeed - turnSpeed;    // Left motor speed from -255 to 255
+  int tempRightSpeed = balanceSpeed + turnSpeed;   // Reft motor speed from -255 to 255
   
   analogWrite(LEFT_PWM_PIN, byte(abs(tempLeftSpeed)));   // Set PWM as magnitude of left speed (0 to 255)
   analogWrite(RIGHT_PWM_PIN, byte(abs(tempRightSpeed))); // Set PWM as magnitude of right speed (0 to 255)
@@ -111,3 +102,4 @@ void updateMotors()
   if (tempRightSpeed < 0) {digitalWrite(RIGHT_DIR_PIN, LOW);} // If negative, direction = LOW;
   else {digitalWrite(RIGHT_DIR_PIN, HIGH);} // If positive, direction = HIGH
 }
+
