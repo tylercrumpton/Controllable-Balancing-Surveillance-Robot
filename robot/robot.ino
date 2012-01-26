@@ -50,7 +50,7 @@ void loop()
 }
 
 // Calculate balanceSpeed given tilt angle.
-int calcPID(int input, int target)
+int calcPID(double input, int target)
 {
   inputPID = input;   // Set PID input to tilt angle.
   bPID.Compute();     // Compute correction, store in outputPID.
@@ -60,31 +60,14 @@ int calcPID(int input, int target)
 
 void balance()
 {
-  // Read the sensors and calculate a tile angle.
-  int gyro  = readGyro();
-  int accel = readAccel();
-  int angle = getAngle(gyro, accel);
+  // Read the sensors and calculate a tilt angle.
+  double angle = getCurrentTilt();
   
   // Try to balance the robot at the desired angle.
   balanceSpeed = calcPID(angle, desiredTilt);
   
   // Update the motor PWM values.
   updateMotors();
-}
-
-int readGyro()
-{
-  //TODO: Read gyro data (analog)
-}
-
-int readAccel()
-{
-  //TODO: Read accelerometer data (analog?)
-}
-
-int getAngle(int gyroSpeed, int acceleration)
-{
-  //TODO: Use some sort of filter to get actual angle.
 }
 
 // Converts the value between +/- MAX_MOTOR_SPEED to an actual PWM signal and direction

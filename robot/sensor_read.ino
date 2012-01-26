@@ -37,18 +37,13 @@ double angleOnlyG, angleOnlyA = 0;
 int timeNow,prevTime = 0;
 
 
-void setup()
+void initSensors()
 {
-  Serial.begin(9600);
   attachInterrupt(0,accelGetValue, CHANGE);         //Interrupt setup on pin 2--triggers on both edges for accel
   Timer1.initialize(samplePeriod);                  //Time one overflow defines sample period
   Timer1.attachInterrupt(sampling_loop);            //Interrupr on overflow calls sampling_loop function
 }
 
-void loop()
-{
-  //Do nothing.  Interrput Driven Program
-}
 
 //Currently 50HZ
 void sampling_loop()
@@ -69,6 +64,11 @@ void sampling_loop()
   Serial.println(angle);
   
   
+}
+
+double getCurrentTilt()
+{
+  return angle;
 }
 
 //Takes the raw acceleration PWM signal and converts to a degree.  Vertical is 0 degrees.
