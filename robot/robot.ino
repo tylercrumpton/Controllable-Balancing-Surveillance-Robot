@@ -1,9 +1,17 @@
+// Notes on tuning from Lauszus:
+/* 1. Select typical operating setting for desired speed, turn off integral and derivative part, and then increase Kp to max or until oscillation occurs.
+   2. If system oscillates, divide Kp by 2.
+   3. Increase Kd and observe behaviour when changing desired speed by about 5% and choose a value of Kd that gives a fast damped response.
+   4. Slowly increase Ki until oscillation starts. Then divide Ki by 2 or 3.
+*/
+
 //INCLUDES----------------------------------------------------------
 #include <PinChangeInt.h> 
 #include <AdaEncoder.h>
 #include <PID_v1.h>
 #include <TimerOne.h>
 #include <math.h>
+#include <KalmanFilter.h>
 
 //Constants---------------------------------------------------------
 //Define Motor Controller Pins
@@ -78,6 +86,9 @@ PID cPID(&inputCPID, &outputCPID, &setpointCPID, CP, CI, CD, DIRECT);
 
 double setpointTPID, inputTPID, outputTPID;
 PID TPID(&inputTPID, &outputTPID, &setpointTPID, TP, TI, TD, DIRECT); //turn correction pid function
+
+// Setup Kalman Filter
+KalmanFilter kmf;
 
 
 void setup()

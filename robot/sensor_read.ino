@@ -25,9 +25,9 @@ void sampling_loop()
   R_clicks_last = R_Clicks;
   double avg_speed = ((L_speed+R_speed)/2.0)*.10776;                  //RPS
   double timeScale = 1000000 /samplePeriod;                          //Compute scalefactor for gyro from degrees per sec.
-  double gyroAngle = -gyroToDegreesPerSec()/timeScale;
+  double gyroAngleRate = gyroToDegreesPerSec();
   double accelAngle = accelToAngle();
-  angle = 0.97*(angle + (gyroAngle)) +(0.0*accelAngle);            //Compute new angl measurement.
+  angle = kmf.calculate(accelAngle, gyroAngleRate, timeScale);            //Compute new angl measurement. (sampleRate is 20ms)
   
   //DEBUG STATEMENTS
   /*angleOnlyG = 1.0*(angleOnlyG + (gyroAngle)) +(0.00*accelAngle);
